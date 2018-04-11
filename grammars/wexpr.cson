@@ -1,0 +1,179 @@
+# If this is your first time writing a language grammar, check out:
+#   - https://flight-manual.atom.io/hacking-atom/sections/creating-a-grammar/
+
+scopeName: 'source.wexpr'
+name: 'Wexpr'
+fileTypes: [
+	'wexpr'
+]
+
+foldingStartMarker: '\\(\\s*$'
+foldingStopMarker: '^\\s*\\)'
+
+patterns: [
+	# General rules - we must have at least one element
+	{
+		include: '#element'
+	}
+
+	# and comments
+	{
+		include : '#comment'
+	}
+]
+
+# see https://github.com/atom/language-json/blob/master/grammars/json.cson
+repository:
+
+	# a comment or comment block
+	comment:
+		patterns: [
+			{
+				begin: ';\\(--'
+				beginCaptures:
+					0:
+						name: 'punctuation.definition.comment.begin'
+				end: '--\\)'
+				endCaptures:
+					0:
+						name: 'punctuation.definition.comment.end'
+				name: 'comment.block.wexpr'
+			}
+
+			{
+				match: '(;).*$\\n?'
+				captures:
+					1:
+						name: 'punctuation.definition.comment'
+				name: 'comment.line.wexpr'
+			}
+		]
+
+	# a constant value - string, number, etc
+	value:
+		patterns: [
+			# constants
+			{
+				match: '(?<!\\.)\\b(true|false)(?!\\s*:)\\b'
+				name: 'constant.language.boolean.$1.wexpr'
+			}
+			{
+				match: '(?<!\\.)\\b(null)(?!\\s*:)\\b'
+				name: 'constant.language.null.wexpr'
+			}
+
+			# numerics
+			{
+				match: '\\b((([0-9]+\\.?[0-9]*)|(\\.[0-9]+))((e|E)(\\+|-)?[0-9]+)?)\\b'
+				name: 'constant.numeric.wexpr'
+			}
+
+			# Strings
+			{
+				begin: '"'
+				beginCaptures:
+					0:
+						name: 'punctuation.definition.string.begin.wexpr'
+				end: '"'
+				endCaptures:
+					0:
+						name: 'punctuation.definition.string.end.wexpr'
+				name: 'string.quoted.wexpr'
+			}
+		]
+
+	# an array of elements
+	array:
+		begin: '#\\('
+		beginCaptures:
+			0:
+				name: 'punctuation.definition.array.begin.wexpr'
+		end: '\\)'
+		endCaptures:
+			1:
+				name: 'invalid.illegal.trailing-array-separator.wexpr'
+			2:
+				name: 'punctuation.definition.array.end.wexpr'
+		name: 'meta.structure.array.wexpr'
+
+		patterns: [
+			{
+				include: '#element'
+			}
+			{
+				include : '#comment'
+			}
+			{
+				include : '#useReference'
+			}
+			{
+				include : '#reference'
+			}
+		]
+
+	# a map of elements
+	map:
+		begin: '@\\('
+		beginCaptures:
+			0:
+				name: 'punctuation.definition.map.begin.wexpr'
+		end: '\\)'
+		endCaptures:
+			1:
+				name: 'invalid.illegal.trailing-map-separator.wexpr'
+			2:
+				name: 'punctuation.definition.map.end.wexpr'
+		name: 'meta.structure.map.wexpr'
+
+		patterns: [
+			{
+				include: '#element'
+			}
+			{
+				include : '#comment'
+			}
+			{
+				include : '#useReference'
+			}
+			{
+				include : '#reference'
+			}
+		]
+
+	reference:
+		patterns: [
+			{
+				match: '\\[.*?\\]'
+				name: 'entity.name.tag' # using yaml's names
+			}
+		]
+
+	useReference:
+		patterns: [
+			{
+				match: '\\*\\[.*?\\]'
+				name: 'entity.name.tag.merge' # using yaml's names
+			}
+		]
+	# a single element
+	element:
+		patterns: [
+			{
+				include: '#value'
+			}
+			{
+				include: '#array'
+			}
+			{
+				include: '#map'
+			}
+			{
+				include : '#comment'
+			}
+			{
+				include : '#useReference'
+			}
+			{
+				include : '#reference'
+			}
+		]

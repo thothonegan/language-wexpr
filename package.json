@@ -1,0 +1,14 @@
+{
+  "name": "language-wexpr",
+  "version": "0.0.1",
+  "description": "Atom language support for wexpr",
+  "keywords": [
+    "language",
+    "grammar"
+  ],
+  "repository": "https://github.com/thothonegan/language-wexpr",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  }
+}
